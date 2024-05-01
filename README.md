@@ -11,10 +11,9 @@ The goal of this exercise is for you to implement a fully functional end-to-end 
 
 You will be working with the data provided by the SpaceX API, and as it should be with any good data challenge, your work will be guided by one central question that we are aiming to help find the answer to:
 
-<aside>
-👨🏼‍🦳 When will there be 42,000 Starlink satellites in orbit, and how many more launches will it take to get there?
 
-</aside>
+> 👨🏼‍🦳 When will there be 42,000 Starlink satellites in orbit, and how many more launches will it take to get there?
+
 
 You can assume that you will have another team working on the data analysis with you so you do not have to provide the full solution. However, in your role as a Backend Engineer, we would expect you to:
 
