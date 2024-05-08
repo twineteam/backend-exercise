@@ -1,0 +1,203 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "name": "starlink",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9a-fA-F]{24}$"
+      },
+      "version": {
+          "type": "string",
+          "default": null
+      },
+      "launch": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{24}$",
+          "ref": "Launch",
+          "default": null
+      },
+      "longitude": {
+          "type": "number",
+          "default": null
+      },
+      "latitude": {
+          "type": "number",
+          "default": null
+      },
+      "height_km": {
+          "type": "number",
+          "default": null
+      },
+      "velocity_kms": {
+          "type": "number",
+          "default": null
+      },
+      "spaceTrack": {
+          "CCSDS_OMM_VERS": {
+              "type": "string",
+              "default": null
+          },
+          "COMMENT": {
+              "type": "string",
+              "default": null
+          },
+          "CREATION_DATE": {
+              "type": "string",
+              "default": null
+          },
+          "ORIGINATOR": {
+              "type": "string",
+              "default": null
+          },
+          "OBJECT_NAME": {
+              "type": "string",
+              "default": null
+          },
+          "OBJECT_ID": {
+              "type": "string",
+              "default": null
+          },
+          "CENTER_NAME": {
+              "type": "string",
+              "default": null
+          },
+          "REF_FRAME": {
+              "type": "string",
+              "default": null
+          },
+          "TIME_SYSTEM": {
+              "type": "string",
+              "default": null
+          },
+          "MEAN_ELEMENT_THEORY": {
+              "type": "string",
+              "default": null
+          },
+          "EPOCH": {
+              "type": "string",
+              "default": null
+          },
+          "MEAN_MOTION": {
+              "type": "number",
+              "default": null
+          },
+          "ECCENTRICITY": {
+              "type": "number",
+              "default": null
+          },
+          "INCLINATION": {
+              "type": "number",
+              "default": null
+          },
+          "RA_OF_ASC_NODE": {
+              "type": "number",
+              "default": null
+          },
+          "ARG_OF_PERICENTER": {
+              "type": "number",
+              "default": null
+          },
+          "MEAN_ANOMALY": {
+              "type": "number",
+              "default": null
+          },
+          "EPHEMERIS_TYPE": {
+              "type": "number",
+              "default": null
+          },
+          "CLASSIFICATION_TYPE": {
+              "type": "string",
+              "default": null
+          },
+          "NORAD_CAT_ID": {
+              "type": "number",
+              "default": null
+          },
+          "ELEMENT_SET_NO": {
+              "type": "number",
+              "default": null
+          },
+          "REV_AT_EPOCH": {
+              "type": "number",
+              "default": null
+          },
+          "BSTAR": {
+              "type": "number",
+              "default": null
+          },
+          "MEAN_MOTION_DOT": {
+              "type": "number",
+              "default": null
+          },
+          "MEAN_MOTION_DDOT": {
+              "type": "number",
+              "default": null
+          },
+          "SEMIMAJOR_AXIS": {
+              "type": "number",
+              "default": null
+          },
+          "PERIOD": {
+              "type": "number",
+              "default": null
+          },
+          "APOAPSIS": {
+              "type": "number",
+              "default": null
+          },
+          "PERIAPSIS": {
+              "type": "number",
+              "default": null
+          },
+          "OBJECT_TYPE": {
+              "type": "string",
+              "default": null
+          },
+          "RCS_SIZE": {
+              "type": "string",
+              "default": null
+          },
+          "COUNTRY_CODE": {
+              "type": "string",
+              "default": null
+          },
+          "LAUNCH_DATE": {
+              "type": "string",
+              "default": null
+          },
+          "SITE": {
+              "type": "string",
+              "default": null
+          },
+          "DECAY_DATE": {
+              "type": "string",
+              "default": null
+          },
+          "DECAYED": {
+              "type": "number",
+              "default": null
+          },
+          "FILE": {
+              "type": "number",
+              "default": null
+          },
+          "GP_ID": {
+              "type": "number",
+              "default": null
+          },
+          "TLE_LINE0": {
+              "type": "string",
+              "default": null
+          },
+          "TLE_LINE1": {
+              "type": "string",
+              "default": null
+          },
+          "TLE_LINE2": {
+              "type": "string",
+              "default": null
+          }
+      }
+  }
+  }
