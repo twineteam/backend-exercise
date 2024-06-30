@@ -18,6 +18,19 @@ definitions:
           $ref: '#/definitions/base_requester'
           path: /starlink
           http_method: GET
+          error_handler:
+            type: CompositeErrorHandler
+            error_handlers:
+              - type: DefaultErrorHandler
+                max_retries: 5
+                backoff_strategies:
+                  - type: ConstantBackoffStrategy
+                    backoff_time_in_seconds: 5
+                response_filters:
+                  - type: HttpResponseFilter
+                    action: IGNORE
+                    http_codes:
+                      - 403
         record_selector:
           type: RecordSelector
           extractor:
@@ -75,6 +88,18 @@ definitions:
           $ref: '#/definitions/base_requester'
           path: launches/upcoming
           http_method: GET
+          error_handler:
+            type: CompositeErrorHandler
+            error_handlers:
+              - type: DefaultErrorHandler
+                max_retries: 10
+                backoff_strategies:
+                  - type: ConstantBackoffStrategy
+                    backoff_time_in_seconds: 5
+                response_filters:
+                  - type: HttpResponseFilter
+                    action: RETRY
+                    error_message_contains: timeout
         record_selector:
           type: RecordSelector
           extractor:
@@ -95,6 +120,28 @@ definitions:
             page_size: 50
             start_from_page: 1
             inject_on_first_request: false
+      incremental_sync:
+        type: DatetimeBasedCursor
+        cursor_field: date_utc
+        cursor_datetime_formats:
+          - '%Y-%m-%dT%H:%M:%S.%fZ'
+        datetime_format: '%Y-%m-%d %H:%M:%S'
+        start_datetime:
+          type: MinMaxDatetime
+          datetime: '{{ config["start_date"] }}'
+          datetime_format: '%Y-%m-%dT%H:%M:%SZ'
+        start_time_option:
+          type: RequestOption
+          inject_into: request_parameter
+          field_name: date_utc
+        end_time_option:
+          type: RequestOption
+          inject_into: request_parameter
+          field_name: date_utc
+        end_datetime:
+          type: MinMaxDatetime
+          datetime: '{{ now_utc().strftime(''%Y-%m-%dT%H:%M:%SZ'') }}'
+          datetime_format: '%Y-%m-%dT%H:%M:%SZ'
       schema_loader:
         type: InlineSchemaLoader
         schema:
@@ -112,11 +159,38 @@ definitions:
             query:
               success: true
             options: {}
+          error_handler:
+            type: CompositeErrorHandler
+            error_handlers:
+              - type: DefaultErrorHandler
+                max_retries: 5
+                backoff_strategies:
+                  - type: ConstantBackoffStrategy
+                    backoff_time_in_seconds: 5
+                response_filters:
+                  - type: HttpResponseFilter
+                    action: IGNORE
+                    error_message_contains: error
+                    http_codes:
+                      - 403
         record_selector:
           type: RecordSelector
           extractor:
             type: DpathExtractor
             field_path: []
+        paginator:
+          type: DefaultPaginator
+          page_token_option:
+            type: RequestOption
+            inject_into: body_json
+            field_name: page
+          page_size_option:
+            type: RequestOption
+            inject_into: body_json
+            field_name: limit
+          pagination_strategy:
+            type: PageIncrement
+            page_size: 10
       schema_loader:
         type: InlineSchemaLoader
         schema:
@@ -136,8 +210,15 @@ spec:
   connection_specification:
     type: object
     $schema: http://json-schema.org/draft-07/schema#
-    required: []
-    properties: {}
+    required:
+      - start_date
+    properties:
+      start_date:
+        type: string
+        title: Start date
+        format: date-time
+        pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$
+        order: 0
     additionalProperties: true
 
 metadata:
@@ -640,9 +721,7 @@ schemas:
           - number
           - 'null'
       date_utc:
-        type:
-          - string
-          - 'null'
+        type: string
       failures:
         type:
           - array
@@ -756,1044 +835,8 @@ schemas:
         type:
           - boolean
           - 'null'
-  successful-launches:
-    type: object
-    $schema: http://json-schema.org/schema#
-    additionalProperties: true
-    properties:
-      docs:
-        type:
-          - array
-          - 'null'
-        items:
-          type:
-            - object
-            - 'null'
-          properties:
-            auto_update:
-              type:
-                - boolean
-                - 'null'
-            capsules:
-              type:
-                - array
-                - 'null'
-              items:
-                type:
-                  - string
-                  - 'null'
-            cores:
-              type:
-                - array
-                - 'null'
-              items:
-                type:
-                  - object
-                  - 'null'
-                properties:
-                  core:
-                    type:
-                      - string
-                      - 'null'
-                  flight:
-                    type:
-                      - number
-                      - 'null'
-                  gridfins:
-                    type:
-                      - boolean
-                      - 'null'
-                  landing_attempt:
-                    type:
-                      - boolean
-                      - 'null'
-                  landing_success:
-                    type:
-                      - boolean
-                      - 'null'
-                  landing_type:
-                    type:
-                      - string
-                      - 'null'
-                  legs:
-                    type:
-                      - boolean
-                      - 'null'
-                  reused:
-                    type:
-                      - boolean
-                      - 'null'
-            crew:
-              type:
-                - array
-                - 'null'
-            date_local:
-              type:
-                - string
-                - 'null'
-            date_precision:
-              type:
-                - string
-                - 'null'
-            date_unix:
-              type:
-                - number
-                - 'null'
-            date_utc:
-              type:
-                - string
-                - 'null'
-            details:
-              type:
-                - string
-                - 'null'
-            failures:
-              type:
-                - array
-                - 'null'
-            fairings:
-              type:
-                - object
-                - 'null'
-              properties:
-                recovered:
-                  type:
-                    - boolean
-                    - 'null'
-                recovery_attempt:
-                  type:
-                    - boolean
-                    - 'null'
-                reused:
-                  type:
-                    - boolean
-                    - 'null'
-                ships:
-                  type:
-                    - array
-                    - 'null'
-            flight_number:
-              type:
-                - number
-                - 'null'
-            id:
-              type:
-                - string
-                - 'null'
-            launchpad:
-              type:
-                - string
-                - 'null'
-            links:
-              type:
-                - object
-                - 'null'
-              properties:
-                article:
-                  type:
-                    - string
-                    - 'null'
-                flickr:
-                  type:
-                    - object
-                    - 'null'
-                  properties:
-                    original:
-                      type:
-                        - array
-                        - 'null'
-                      items:
-                        type:
-                          - string
-                          - 'null'
-                    small:
-                      type:
-                        - array
-                        - 'null'
-                patch:
-                  type:
-                    - object
-                    - 'null'
-                  properties:
-                    large:
-                      type:
-                        - string
-                        - 'null'
-                    small:
-                      type:
-                        - string
-                        - 'null'
-                presskit:
-                  type:
-                    - string
-                    - 'null'
-                reddit:
-                  type:
-                    - object
-                    - 'null'
-                  properties:
-                    launch:
-                      type:
-                        - string
-                        - 'null'
-                webcast:
-                  type:
-                    - string
-                    - 'null'
-                wikipedia:
-                  type:
-                    - string
-                    - 'null'
-                youtube_id:
-                  type:
-                    - string
-                    - 'null'
-            name:
-              type:
-                - string
-                - 'null'
-            net:
-              type:
-                - boolean
-                - 'null'
-            payloads:
-              type:
-                - array
-                - 'null'
-              items:
-                type:
-                  - string
-                  - 'null'
-            rocket:
-              type:
-                - string
-                - 'null'
-            ships:
-              type:
-                - array
-                - 'null'
-              items:
-                type:
-                  - string
-                  - 'null'
-            static_fire_date_unix:
-              type:
-                - number
-                - 'null'
-            static_fire_date_utc:
-              type:
-                - string
-                - 'null'
-            success:
-              type:
-                - boolean
-                - 'null'
-            tbd:
-              type:
-                - boolean
-                - 'null'
-            upcoming:
-              type:
-                - boolean
-                - 'null'
-            window:
-              type:
-                - number
-                - 'null'
-      hasNextPage:
-        type:
-          - boolean
-          - 'null'
-      hasPrevPage:
-        type:
-          - boolean
-          - 'null'
-      limit:
-        type:
-          - number
-          - 'null'
-      nextPage:
-        type:
-          - number
-          - 'null'
-      offset:
-        type:
-          - number
-          - 'null'
-      page:
-        type:
-          - number
-          - 'null'
-      pagingCounter:
-        type:
-          - number
-          - 'null'
-      totalDocs:
-        type:
-          - number
-          - 'null'
-      totalPages:
-        type:
-          - number
-          - 'null'
-version: 2.0.0
-
-type: DeclarativeSource
-
-check:
-  type: CheckStream
-  stream_names:
-    - get_starlink
-
-definitions:
-  streams:
-    get_starlink:
-      type: DeclarativeStream
-      name: get_starlink
-      retriever:
-        type: SimpleRetriever
-        requester:
-          $ref: '#/definitions/base_requester'
-          path: /starlink
-          http_method: GET
-        record_selector:
-          type: RecordSelector
-          extractor:
-            type: DpathExtractor
-            field_path: []
-      schema_loader:
-        type: InlineSchemaLoader
-        schema:
-          $ref: '#/schemas/get_starlink'
-    query_starlink:
-      type: DeclarativeStream
-      name: query_starlink
-      retriever:
-        type: SimpleRetriever
-        requester:
-          $ref: '#/definitions/base_requester'
-          path: /starlink/query
-          http_method: POST
-          request_body_json:
-            query: {}
-            options:
-              page: 1
-              sort:
-                flight_number: asc
-              limit: 50
-        record_selector:
-          type: RecordSelector
-          extractor:
-            type: DpathExtractor
-            field_path: []
-        paginator:
-          type: DefaultPaginator
-          page_token_option:
-            type: RequestOption
-            inject_into: body_json
-            field_name: page
-          page_size_option:
-            type: RequestOption
-            field_name: limit
-            inject_into: body_json
-          pagination_strategy:
-            type: PageIncrement
-            page_size: 50
-            start_from_page: 1
-      schema_loader:
-        type: InlineSchemaLoader
-        schema:
-          $ref: '#/schemas/query_starlink'
-    upcoming launches:
-      type: DeclarativeStream
-      name: upcoming launches
-      retriever:
-        type: SimpleRetriever
-        requester:
-          $ref: '#/definitions/base_requester'
-          path: launches/upcoming
-          http_method: GET
-        record_selector:
-          type: RecordSelector
-          extractor:
-            type: DpathExtractor
-            field_path: []
-        paginator:
-          type: DefaultPaginator
-          page_token_option:
-            type: RequestOption
-            inject_into: body_json
-            field_name: page
-          page_size_option:
-            type: RequestOption
-            field_name: limit
-            inject_into: body_json
-          pagination_strategy:
-            type: PageIncrement
-            page_size: 50
-            start_from_page: 1
-            inject_on_first_request: false
-      schema_loader:
-        type: InlineSchemaLoader
-        schema:
-          $ref: '#/schemas/upcoming launches'
-    successful-launches:
-      type: DeclarativeStream
-      name: successful-launches
-      retriever:
-        type: SimpleRetriever
-        requester:
-          $ref: '#/definitions/base_requester'
-          path: /launches/query
-          http_method: POST
-          request_body_json:
-            query:
-              success: true
-            options: {}
-        record_selector:
-          type: RecordSelector
-          extractor:
-            type: DpathExtractor
-            field_path: []
-      schema_loader:
-        type: InlineSchemaLoader
-        schema:
-          $ref: '#/schemas/successful-launches'
-  base_requester:
-    type: HttpRequester
-    url_base: https://api.spacexdata.com/v4
-
-streams:
-  - $ref: '#/definitions/streams/get_starlink'
-  - $ref: '#/definitions/streams/query_starlink'
-  - $ref: '#/definitions/streams/upcoming launches'
-  - $ref: '#/definitions/streams/successful-launches'
-
-spec:
-  type: Spec
-  connection_specification:
-    type: object
-    $schema: http://json-schema.org/draft-07/schema#
-    required: []
-    properties: {}
-    additionalProperties: true
-
-metadata:
-  autoImportSchema:
-    get_starlink: true
-    query_starlink: true
-    upcoming launches: true
-    successful-launches: true
-
-schemas:
-  get_starlink:
-    type: object
-    $schema: http://json-schema.org/schema#
-    additionalProperties: true
-    properties:
-      version:
-        type:
-          - string
-          - 'null'
-      height_km:
-        type:
-          - number
-          - 'null'
-      id:
-        type:
-          - string
-          - 'null'
-      latitude:
-        type:
-          - number
-          - 'null'
-      launch:
-        type:
-          - string
-          - 'null'
-      longitude:
-        type:
-          - number
-          - 'null'
-      spaceTrack:
-        type:
-          - object
-          - 'null'
-        properties:
-          APOAPSIS:
-            type:
-              - number
-              - 'null'
-          ARG_OF_PERICENTER:
-            type:
-              - number
-              - 'null'
-          BSTAR:
-            type:
-              - number
-              - 'null'
-          CCSDS_OMM_VERS:
-            type:
-              - string
-              - 'null'
-          CENTER_NAME:
-            type:
-              - string
-              - 'null'
-          CLASSIFICATION_TYPE:
-            type:
-              - string
-              - 'null'
-          COMMENT:
-            type:
-              - string
-              - 'null'
-          COUNTRY_CODE:
-            type:
-              - string
-              - 'null'
-          CREATION_DATE:
-            type:
-              - string
-              - 'null'
-          DECAYED:
-            type:
-              - number
-              - 'null'
-          DECAY_DATE:
-            type:
-              - string
-              - 'null'
-          ECCENTRICITY:
-            type:
-              - number
-              - 'null'
-          ELEMENT_SET_NO:
-            type:
-              - number
-              - 'null'
-          EPHEMERIS_TYPE:
-            type:
-              - number
-              - 'null'
-          EPOCH:
-            type:
-              - string
-              - 'null'
-          FILE:
-            type:
-              - number
-              - 'null'
-          GP_ID:
-            type:
-              - number
-              - 'null'
-          INCLINATION:
-            type:
-              - number
-              - 'null'
-          LAUNCH_DATE:
-            type:
-              - string
-              - 'null'
-          MEAN_ANOMALY:
-            type:
-              - number
-              - 'null'
-          MEAN_ELEMENT_THEORY:
-            type:
-              - string
-              - 'null'
-          MEAN_MOTION:
-            type:
-              - number
-              - 'null'
-          MEAN_MOTION_DDOT:
-            type:
-              - number
-              - 'null'
-          MEAN_MOTION_DOT:
-            type:
-              - number
-              - 'null'
-          NORAD_CAT_ID:
-            type:
-              - number
-              - 'null'
-          OBJECT_ID:
-            type:
-              - string
-              - 'null'
-          OBJECT_NAME:
-            type:
-              - string
-              - 'null'
-          OBJECT_TYPE:
-            type:
-              - string
-              - 'null'
-          ORIGINATOR:
-            type:
-              - string
-              - 'null'
-          PERIAPSIS:
-            type:
-              - number
-              - 'null'
-          PERIOD:
-            type:
-              - number
-              - 'null'
-          RA_OF_ASC_NODE:
-            type:
-              - number
-              - 'null'
-          RCS_SIZE:
-            type:
-              - string
-              - 'null'
-          REF_FRAME:
-            type:
-              - string
-              - 'null'
-          REV_AT_EPOCH:
-            type:
-              - number
-              - 'null'
-          SEMIMAJOR_AXIS:
-            type:
-              - number
-              - 'null'
-          SITE:
-            type:
-              - string
-              - 'null'
-          TIME_SYSTEM:
-            type:
-              - string
-              - 'null'
-          TLE_LINE0:
-            type:
-              - string
-              - 'null'
-          TLE_LINE1:
-            type:
-              - string
-              - 'null'
-          TLE_LINE2:
-            type:
-              - string
-              - 'null'
-      velocity_kms:
-        type:
-          - number
-          - 'null'
-  query_starlink:
-    type: object
-    $schema: http://json-schema.org/schema#
-    additionalProperties: true
-    properties:
-      docs:
-        type:
-          - array
-          - 'null'
-        items:
-          type:
-            - object
-            - 'null'
-          properties:
-            version:
-              type:
-                - string
-                - 'null'
-            id:
-              type:
-                - string
-                - 'null'
-            launch:
-              type:
-                - string
-                - 'null'
-            spaceTrack:
-              type:
-                - object
-                - 'null'
-              properties:
-                APOAPSIS:
-                  type:
-                    - number
-                    - 'null'
-                ARG_OF_PERICENTER:
-                  type:
-                    - number
-                    - 'null'
-                BSTAR:
-                  type:
-                    - number
-                    - 'null'
-                CCSDS_OMM_VERS:
-                  type:
-                    - string
-                    - 'null'
-                CENTER_NAME:
-                  type:
-                    - string
-                    - 'null'
-                CLASSIFICATION_TYPE:
-                  type:
-                    - string
-                    - 'null'
-                COMMENT:
-                  type:
-                    - string
-                    - 'null'
-                COUNTRY_CODE:
-                  type:
-                    - string
-                    - 'null'
-                CREATION_DATE:
-                  type:
-                    - string
-                    - 'null'
-                DECAYED:
-                  type:
-                    - number
-                    - 'null'
-                DECAY_DATE:
-                  type:
-                    - string
-                    - 'null'
-                ECCENTRICITY:
-                  type:
-                    - number
-                    - 'null'
-                ELEMENT_SET_NO:
-                  type:
-                    - number
-                    - 'null'
-                EPHEMERIS_TYPE:
-                  type:
-                    - number
-                    - 'null'
-                EPOCH:
-                  type:
-                    - string
-                    - 'null'
-                FILE:
-                  type:
-                    - number
-                    - 'null'
-                GP_ID:
-                  type:
-                    - number
-                    - 'null'
-                INCLINATION:
-                  type:
-                    - number
-                    - 'null'
-                LAUNCH_DATE:
-                  type:
-                    - string
-                    - 'null'
-                MEAN_ANOMALY:
-                  type:
-                    - number
-                    - 'null'
-                MEAN_ELEMENT_THEORY:
-                  type:
-                    - string
-                    - 'null'
-                MEAN_MOTION:
-                  type:
-                    - number
-                    - 'null'
-                MEAN_MOTION_DDOT:
-                  type:
-                    - number
-                    - 'null'
-                MEAN_MOTION_DOT:
-                  type:
-                    - number
-                    - 'null'
-                NORAD_CAT_ID:
-                  type:
-                    - number
-                    - 'null'
-                OBJECT_ID:
-                  type:
-                    - string
-                    - 'null'
-                OBJECT_NAME:
-                  type:
-                    - string
-                    - 'null'
-                OBJECT_TYPE:
-                  type:
-                    - string
-                    - 'null'
-                ORIGINATOR:
-                  type:
-                    - string
-                    - 'null'
-                PERIAPSIS:
-                  type:
-                    - number
-                    - 'null'
-                PERIOD:
-                  type:
-                    - number
-                    - 'null'
-                RA_OF_ASC_NODE:
-                  type:
-                    - number
-                    - 'null'
-                RCS_SIZE:
-                  type:
-                    - string
-                    - 'null'
-                REF_FRAME:
-                  type:
-                    - string
-                    - 'null'
-                REV_AT_EPOCH:
-                  type:
-                    - number
-                    - 'null'
-                SEMIMAJOR_AXIS:
-                  type:
-                    - number
-                    - 'null'
-                SITE:
-                  type:
-                    - string
-                    - 'null'
-                TIME_SYSTEM:
-                  type:
-                    - string
-                    - 'null'
-                TLE_LINE0:
-                  type:
-                    - string
-                    - 'null'
-                TLE_LINE1:
-                  type:
-                    - string
-                    - 'null'
-                TLE_LINE2:
-                  type:
-                    - string
-                    - 'null'
-      hasNextPage:
-        type:
-          - boolean
-          - 'null'
-      hasPrevPage:
-        type:
-          - boolean
-          - 'null'
-      limit:
-        type:
-          - number
-          - 'null'
-      nextPage:
-        type:
-          - number
-          - 'null'
-      offset:
-        type:
-          - number
-          - 'null'
-      page:
-        type:
-          - number
-          - 'null'
-      pagingCounter:
-        type:
-          - number
-          - 'null'
-      totalDocs:
-        type:
-          - number
-          - 'null'
-      totalPages:
-        type:
-          - number
-          - 'null'
-  upcoming launches:
-    type: object
-    $schema: http://json-schema.org/schema#
-    additionalProperties: true
-    properties:
-      auto_update:
-        type:
-          - boolean
-          - 'null'
-      capsules:
-        type:
-          - array
-          - 'null'
-      cores:
-        type:
-          - array
-          - 'null'
-        items:
-          type:
-            - object
-            - 'null'
-          properties:
-            core:
-              type:
-                - string
-                - 'null'
-            flight:
-              type:
-                - number
-                - 'null'
-            gridfins:
-              type:
-                - boolean
-                - 'null'
-            legs:
-              type:
-                - boolean
-                - 'null'
-            reused:
-              type:
-                - boolean
-                - 'null'
-      crew:
-        type:
-          - array
-          - 'null'
-      date_local:
-        type:
-          - string
-          - 'null'
-      date_precision:
-        type:
-          - string
-          - 'null'
-      date_unix:
-        type:
-          - number
-          - 'null'
-      date_utc:
-        type:
-          - string
-          - 'null'
-      failures:
-        type:
-          - array
-          - 'null'
-      fairings:
-        type:
-          - object
-          - 'null'
-        properties:
-          ships:
-            type:
-              - array
-              - 'null'
-      flight_number:
-        type:
-          - number
-          - 'null'
-      id:
-        type:
-          - string
-          - 'null'
-      launch_library_id:
-        type:
-          - string
-          - 'null'
-      launchpad:
-        type:
-          - string
-          - 'null'
-      links:
-        type:
-          - object
-          - 'null'
-        properties:
-          flickr:
-            type:
-              - object
-              - 'null'
-            properties:
-              original:
-                type:
-                  - array
-                  - 'null'
-              small:
-                type:
-                  - array
-                  - 'null'
-          patch:
-            type:
-              - object
-              - 'null'
-            properties:
-              large:
-                type:
-                  - string
-                  - 'null'
-              small:
-                type:
-                  - string
-                  - 'null'
-          reddit:
-            type:
-              - object
-              - 'null'
-            properties:
-              campaign:
-                type:
-                  - string
-                  - 'null'
-              recovery:
-                type:
-                  - string
-                  - 'null'
-          webcast:
-            type:
-              - string
-              - 'null'
-          youtube_id:
-            type:
-              - string
-              - 'null'
-      name:
-        type:
-          - string
-          - 'null'
-      net:
-        type:
-          - boolean
-          - 'null'
-      payloads:
-        type:
-          - array
-          - 'null'
-        items:
-          type:
-            - string
-            - 'null'
-      rocket:
-        type:
-          - string
-          - 'null'
-      ships:
-        type:
-          - array
-          - 'null'
-      tbd:
-        type:
-          - boolean
-          - 'null'
-      upcoming:
-        type:
-          - boolean
-          - 'null'
+    required:
+      - date_utc
   successful-launches:
     type: object
     $schema: http://json-schema.org/schema#
