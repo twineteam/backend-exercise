@@ -1,0 +1,45 @@
+Statement:
+
+The goal of this exercise is for you to implement a fully functional end-to-end ETL pipeline the open-source, full-stack data integration platform Airbyte.
+
+You will be working with the data provided by the SpaceX API, and as it should be with any good data challenge, your work will be guided by one central question that we are aiming to help find the answer to:
+
+👨🏼‍🦳 When will there be 42,000 Starlink satellites in orbit, and how many more launches will it take to get there?
+
+TODOs:
+- Create an Airbyte Custom Source Connector for SpaceX API (following this official documentation)
+- [Optional] Configure Airbyte’s Postgres Destination to send the data extracted from the source connector in the previous step to a Postgres instance. Or, you can choose a destination of your choice (S3, MongoDB, Snowflake, etc.)
+
+
+
+👨🏼‍🦳 When will there be 42,000 Starlink satellites in orbit, and how many more launches will it take to get there?
+Some launches fail to put a satellite in orbit, and hence, we have to maybe get a percentage to estimate. For example, out of 100 launches, 10 launches successfully put a satellite in orbit.
+So based on the current number of launches will is 181 success, 5 failed.
+
+Number of current starlink satellitles in orbit = 3526
+Number of success percentage is 181/186 = 97%
+
+Typically, once you get the data of how long upcoming launches are scheduled, you can forecast the timeline and get the result of when will there be 42,000 starlink satellites in orbit.
+For example, if there is a launch every week, then it will take (42,000 - 3526) / 52 = ~739 years
+
+I am not familiar with AirByte but it seems it's used mainly to quickly spin up native HTTP API integrations or 3rd party integrations to ingest data.
+
+These are some features it supports such as: 
+- Incremental reads implemented using datetime cursor
+- Error handling exponetial backoff
+- Simple transformation
+- Custom namespaces
+- DBT Cloud integrations (paid) - allows to transform raw data into a format that is suitable for analysis
+
+I configured source, destinations and configured some connections using Connector UI. 
+
+Source would be SpaceX API and destinations include S3 and PostgreSQL.
+
+
+Design techniques:
+
+1) Typically, I would use pagination to avoid loading all the data at once.
+2) Deduplication - I would consider scenarios where for some reason, the upstream data API gets called multiple times, and hence the downstream database should have some logic to deduplicate the data.
+3) Database schema design - It is very important to have the right schema design, snowflake (longer joins, less redundant) or star (lesser joins, more redundant data)
+4) Data validation - Typically, before the data gets loaded in the production database, there needs to be a layer of check (maybe SQL or bash) to check for inconsistencies or errors
+5) Backfilling - sometimes data is corrupted or some ETL jobs fail, hence backfilling should be properly considered and implemented. Usually, it is with reference with a start and end date. The API should support time range queries.
