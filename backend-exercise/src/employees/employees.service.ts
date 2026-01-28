@@ -40,9 +40,6 @@ export class EmployeesService {
     // Update the employee
     employees[index] = { ...employees[index], ...updates };
 
-    // BUG: No cache invalidation here!
-    // The analytics cache will serve stale data until TTL expires
-
     return employees[index];
   }
 

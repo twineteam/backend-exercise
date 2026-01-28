@@ -15,7 +15,7 @@
 **Subject:** Dashboard is slow and showing wrong numbers
 
 **Description:**
-Our HR director reports that the department analytics dashboard has been slow and sometimes shows incorrect headcount and salary data. She says it's been getting worse over the past few weeks. When she refreshes, sometimes the numbers change even though no one has made updates.
+Our HR director reports that the department analytics dashboard has been slow, especially after they added more departments. She also mentioned that after updating an employee's salary or department, the metrics on the dashboard don't always reflect the changes right away.
 
 **Priority:** High
 
