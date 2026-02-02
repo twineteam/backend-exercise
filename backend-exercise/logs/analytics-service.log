@@ -1,31 +1,31 @@
 # analytics-service.log (last 24 hours, filtered)
 
-[2026-01-15 09:23:14] INFO  GET /analytics/department-metrics?customerId=acme - 2847ms - cache:MISS
-[2026-01-15 09:23:18] INFO  GET /analytics/department-metrics?customerId=acme - 312ms - cache:HIT
+[2026-01-15 09:23:14] INFO  GET /analytics/department-metrics - 2847ms - cache:MISS [customer:acme]
+[2026-01-15 09:23:18] INFO  GET /analytics/department-metrics - 312ms - cache:HIT [customer:acme]
 [2026-01-15 09:25:01] WARN  Redis connection timeout, reconnecting...
 [2026-01-15 09:25:01] INFO  Redis reconnected successfully
-[2026-01-15 09:31:22] INFO  GET /analytics/department-metrics?customerId=smallco - 89ms - cache:MISS
-[2026-01-15 09:35:33] INFO  GET /analytics/department-metrics?customerId=acme - 2912ms - cache:MISS
-[2026-01-15 09:35:37] INFO  GET /analytics/department-metrics?customerId=acme - 287ms - cache:HIT
-[2026-01-15 09:55:33] INFO  GET /analytics/department-metrics?customerId=acme - 2901ms - cache:MISS
-[2026-01-15 09:55:37] INFO  GET /analytics/department-metrics?customerId=acme - 295ms - cache:HIT
-[2026-01-15 10:02:15] INFO  PUT /employees/12847?customerId=acme - 45ms - updated salary
-[2026-01-15 10:02:44] INFO  GET /analytics/department-metrics?customerId=acme - 301ms - cache:HIT
+[2026-01-15 09:31:22] INFO  GET /analytics/department-metrics - 89ms - cache:MISS [customer:smallco]
+[2026-01-15 09:35:33] INFO  GET /analytics/department-metrics - 2912ms - cache:MISS [customer:acme]
+[2026-01-15 09:35:37] INFO  GET /analytics/department-metrics - 287ms - cache:HIT [customer:acme]
+[2026-01-15 09:55:33] INFO  GET /analytics/department-metrics - 2901ms - cache:MISS [customer:acme]
+[2026-01-15 09:55:37] INFO  GET /analytics/department-metrics - 295ms - cache:HIT [customer:acme]
+[2026-01-15 10:02:15] INFO  PUT /employees/12847 - 45ms - updated salary [customer:acme]
+[2026-01-15 10:02:44] INFO  GET /analytics/department-metrics - 301ms - cache:HIT [customer:acme]
 [2026-01-15 10:15:19] WARN  Redis connection timeout, reconnecting...
 [2026-01-15 10:15:19] INFO  Redis reconnected successfully
-[2026-01-15 10:33:02] INFO  GET /analytics/department-metrics?customerId=acme - 2956ms - cache:MISS
-[2026-01-15 10:33:06] INFO  GET /analytics/department-metrics?customerId=acme - 298ms - cache:HIT
-[2026-01-15 10:47:55] INFO  GET /analytics/department-metrics?customerId=smallco - 92ms - cache:MISS
-[2026-01-15 10:55:33] INFO  GET /analytics/department-metrics?customerId=acme - 2887ms - cache:MISS
-[2026-01-15 10:55:37] INFO  GET /analytics/department-metrics?customerId=acme - 291ms - cache:HIT
-[2026-01-15 11:01:33] INFO  PUT /employees/8921?customerId=acme - 42ms - updated department
-[2026-01-15 11:02:03] INFO  GET /analytics/department-metrics?customerId=acme - 315ms - cache:HIT
+[2026-01-15 10:33:02] INFO  GET /analytics/department-metrics - 2956ms - cache:MISS [customer:acme]
+[2026-01-15 10:33:06] INFO  GET /analytics/department-metrics - 298ms - cache:HIT [customer:acme]
+[2026-01-15 10:47:55] INFO  GET /analytics/department-metrics - 92ms - cache:MISS [customer:smallco]
+[2026-01-15 10:55:33] INFO  GET /analytics/department-metrics - 2887ms - cache:MISS [customer:acme]
+[2026-01-15 10:55:37] INFO  GET /analytics/department-metrics - 291ms - cache:HIT [customer:acme]
+[2026-01-15 11:01:33] INFO  PUT /employees/8921 - 42ms - updated department [customer:acme]
+[2026-01-15 11:02:03] INFO  GET /analytics/department-metrics - 315ms - cache:HIT [customer:acme]
 [2026-01-15 11:15:44] WARN  Redis connection timeout, reconnecting...
 [2026-01-15 11:15:44] INFO  Redis reconnected successfully
-[2026-01-15 11:23:02] INFO  GET /analytics/department-metrics?customerId=acme - 2891ms - cache:MISS
-[2026-01-15 11:45:17] INFO  GET /analytics/department-metrics?customerId=smallco - 87ms - cache:MISS
-[2026-01-15 11:57:29] INFO  GET /analytics/department-metrics?customerId=acme - 2923ms - cache:MISS
-[2026-01-15 11:57:33] INFO  GET /analytics/department-metrics?customerId=acme - 288ms - cache:HIT
-[2026-01-15 12:03:29] INFO  PUT /employees/15632?customerId=acme - 45ms - updated salary
-[2026-01-15 12:03:59] INFO  GET /analytics/department-metrics?customerId=acme - 289ms - cache:HIT
-[2026-01-15 12:33:45] INFO  GET /analytics/department-metrics?customerId=acme - 2934ms - cache:MISS
+[2026-01-15 11:23:02] INFO  GET /analytics/department-metrics - 2891ms - cache:MISS [customer:acme]
+[2026-01-15 11:45:17] INFO  GET /analytics/department-metrics - 87ms - cache:MISS [customer:smallco]
+[2026-01-15 11:57:29] INFO  GET /analytics/department-metrics - 2923ms - cache:MISS [customer:acme]
+[2026-01-15 11:57:33] INFO  GET /analytics/department-metrics - 288ms - cache:HIT [customer:acme]
+[2026-01-15 12:03:29] INFO  PUT /employees/15632 - 45ms - updated salary [customer:acme]
+[2026-01-15 12:03:59] INFO  GET /analytics/department-metrics - 289ms - cache:HIT [customer:acme]
+[2026-01-15 12:33:45] INFO  GET /analytics/department-metrics - 2934ms - cache:MISS [customer:acme]

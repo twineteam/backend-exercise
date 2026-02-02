@@ -25,6 +25,10 @@ logs/                   # Production log files
 docs/                   # Customer and system documentation
 ```
 
+## Production Logs
+
+The `logs/` directory contains sample production logs. Log entries include `[customer:X]` metadata at the end indicating which customer tenant triggered the request. This is internal routing metadata and not an API parameter.
+
 ## The API
 
 ### GET /analytics/department-metrics
